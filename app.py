@@ -152,7 +152,7 @@ def main():
     # FULL DATASET
     # print(dataset)
     draw_frame()
-    draw_number(number1=5, number2=5)
+    draw_number(number1=6, number2=1)
 
     # PRETTY PRINT DATASET
     print(tabulate(preview_dataset, headers='keys',
