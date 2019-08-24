@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-import os 
+import os
 
 from tabulate import tabulate
 
@@ -8,13 +8,14 @@ import colorama
 from colorama import Fore
 
 from threading import Timer
-import time 
+import time
 
 dataset = None
 preview_dataset = None
 
-# clear command for shell
-clear_screen = lambda: os.system('clear')
+
+def clear_screen(): return os.system('clear')
+
 
 def prepare_datasets():
     global dataset, preview_dataset
@@ -217,16 +218,16 @@ def getnumbers(number=None, size=0):
 
 
 def draw_number(number=None):
-    num = number 
-    num1=None
-    num2=None
+    num = number
+    num1 = None
+    num2 = None
 
-    if (len(str(number))>1):
+    if (len(str(number)) > 1):
         num1, num2 = str(number)
         print(num1, type(num1), num2, type(num2))
         num1 = int(num1)
         num2 = int(num2)
-    
+
     if (num1 != None and num2 != None):
         num1 = shift_object(2, 2, getnumbers(num1, 0))
         num2 = shift_object(2, 9, getnumbers(num2, 0))
@@ -247,11 +248,12 @@ def draw_number(number=None):
 def clear_table():
     for x in range(1, 15):
         for y in range(1, 15):
-            accdata(x,y, " ", preview=True)
+            accdata(x, y, " ", preview=True)
+
 
 def draw_animate():
     running = True
-    
+
     seconds = 60
     while running:
         if (seconds == 0):
@@ -262,9 +264,9 @@ def draw_animate():
         draw_number(number=seconds)
         # PRETTY PRINT DATASET
         print(tabulate(preview_dataset, headers='keys',
-                    tablefmt='fancy_grid', stralign='center'))
-        seconds = seconds -1
-    
+                       tablefmt='fancy_grid', stralign='center'))
+        seconds = seconds - 1
+
         time.sleep(1)
 
 
