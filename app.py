@@ -81,7 +81,7 @@ def accdata(row, col, value='', preview=False):
 
 def shift_object(x=0, y=0, shiftobject=None):
     for obj in shiftobject:
-        print(obj)
+        # print(obj)
         if(x != 0):
             obj[0] = obj[0] + x
 
@@ -176,8 +176,11 @@ def draw_number(number0=None, number1=None, number2=None):
 
         for pixel in number1:
             accdata(pixel[0], pixel[1], 'O', preview=True)
+            # print(pixel[0], pixel[1], accdata(pixel[0], pixel[1]))
+            # print("Setting pixel:", accdata(pixel[0], pixel[1]))
         for pixel2 in number2:
             accdata(pixel2[0], pixel2[1], 'O', preview=True)
+            # print(pixel2[0], pixel2[1], accdata(pixel2[0], pixel2[1]))
 
 
 def main():
@@ -186,7 +189,7 @@ def main():
     prepare_datasets()
 
     # FULL DATASET
-    # print(dataset)
+    print(dataset)
     draw_frame()
     draw_number(number1=9, number2=3)
 
