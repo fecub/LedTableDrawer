@@ -1,6 +1,9 @@
 import pandas as pd
 import numpy as np
 from tabulate import tabulate
+import colorama
+from colorama import Fore
+
 
 class bcolors:
     HEADER = '\033[95m'
@@ -115,11 +118,34 @@ def getnumbers(number=None):
     two = [[0, 0], [0, 1], [0, 2], [0, 3], [0, 4], [1, 4], [2, 4], [3, 4], [4, 4], [5, 4], [6, 4], [6, 0], [
         6, 1], [6, 2], [6, 3], [6, 4], [7, 0], [8, 0], [9, 0], [10, 0], [11, 4], [11, 3], [11, 2], [11, 1], [11, 0]]
 
+    three = [[0, 0], [0, 1], [0, 2], [0, 3], [0, 4], [0, 4], [1, 4], [2, 4], [3, 4], [4, 4], [5, 4],
+             [6, 4], [7, 4], [8, 4], [9, 4], [10, 4], [11, 4], [11, 3], [11, 2], [11, 1], [11, 0],
+             [6, 3], [6, 2], [6, 1], [6, 0]]
+
+    four = [[0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [
+            6, 0], [0, 4], [1, 4], [2, 4], [3, 4], [4, 4], [5, 4], [6, 4], [0, 4], [1, 4], [2, 4], [3, 4], [4, 4], [5, 4], [
+            6, 4], [6, 4], [7, 4], [8, 4], [9, 4], [10, 4], [11, 4], [6,1],[6,2],[6,3]]
+
     five = [[0, 0], [0, 1], [0, 2], [0, 3], [0, 4], [0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [
         6, 1], [6, 2], [6, 3], [6, 4], [7, 4], [8, 4], [9, 4], [10, 4], [11, 4], [11, 3], [11, 2], [11, 1], [11, 0]]
 
     six = [[0, 0], [0, 1], [0, 2], [0, 3], [0, 4], [0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0], [8, 0], [
         9, 0], [10, 0], [11, 0], [11, 1], [11, 2], [11, 3], [11, 4], [10, 4], [9, 4], [8, 4], [7, 4], [6, 4], [6, 3], [6, 2], [6, 1]]
+
+
+    seven = [[0, 0], [0, 1], [0, 2], [0, 3], [0, 4], [1, 4], [2, 4], [3, 4], [4, 4], [5, 4],
+             [6, 4], [7, 4], [8, 4], [9, 4], [10, 4], [11, 4]]
+
+    eight = [[0, 0], [0, 1], [0, 2], [0, 3], [0, 4], [0, 4], [1, 4], [2, 4], [3, 4], [4, 4], [5, 4],
+             [6, 4], [7, 4], [8, 4], [9, 4], [10, 4], [11, 4], [11, 3], [11, 2], [11, 1], [11, 0],
+             [6, 3], [6, 2], [6, 1], [6, 0], [0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [5, 0],
+             [6, 0], [7, 0], [8, 0], [9, 0], [10, 0], [11, 0]]
+    
+    nine = [[0, 0], [0, 1], [0, 2], [0, 3], [0, 4], [0, 4], [1, 4], [2, 4], [3, 4], [4, 4], [5, 4],
+             [6, 4], [7, 4], [8, 4], [9, 4], [10, 4], [11, 4], [11, 3], [11, 2], [11, 1], [11, 0],
+             [6, 3], [6, 2], [6, 1], [6, 0], [0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [5, 0],
+             [6, 0]]
+
 
     if (number == 0):
         return zero
@@ -127,10 +153,20 @@ def getnumbers(number=None):
         return one
     if (number == 2):
         return two
+    if (number == 3):
+        return three
+    if (number == 4):
+        return four
     if (number == 5):
         return five
     if (number == 6):
         return six
+    if (number == 7):
+        return seven
+    if (number == 8):
+        return eight
+    if (number == 9):
+        return nine
 
 
 def draw_number(number0=None, number1=None, number2=None):
@@ -139,7 +175,7 @@ def draw_number(number0=None, number1=None, number2=None):
         number2 = shift_object(2, 9, getnumbers(number2))
 
         for pixel in number1:
-            accdata(pixel[0], pixel[1], bcolors.FAIL+'O'+bcolors.ENDC, preview=True)
+            accdata(pixel[0], pixel[1], 'O', preview=True)
         for pixel2 in number2:
             accdata(pixel2[0], pixel2[1], 'O', preview=True)
 
@@ -152,7 +188,7 @@ def main():
     # FULL DATASET
     # print(dataset)
     draw_frame()
-    draw_number(number1=6, number2=1)
+    draw_number(number1=9, number2=3)
 
     # PRETTY PRINT DATASET
     print(tabulate(preview_dataset, headers='keys',
