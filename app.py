@@ -24,7 +24,7 @@ LED_DMA        = 10      # DMA channel to use for generating signal (try 10)
 LED_BRIGHTNESS = 60     # Set to 0 for darkest and 255 for brightest
 LED_INVERT     = False   # True to invert the signal (when using NPN transistor level shift)
 LED_CHANNEL    = 0       # set to '1' for GPIOs 13, 19, 41, 45 or 53
-RELAYPIN = 13
+RELAYPIN = 19
 GPIO.setmode(GPIO.BOARD)
 GPIO.setup(RELAYPIN, GPIO.OUT)
 GPIO.output(RELAYPIN, GPIO.LOW)
@@ -316,9 +316,17 @@ def draw_lose(strip,color):
             strip.setPixelColor(accdata(x, y), color)
     strip.show()
 
-def clear_table(strip, color):
-    for x in range(1, 15):
-        for y in range(1, 15):
+def clear_table(strip, color, all=False):
+    area_from=1
+    area_to = 15
+
+    if all:
+        area_from = 0
+        area_to=16
+   
+
+    for x in range(area_from, area_to):
+        for y in range(area_from, area_to):
             # accdata(x, y, " ", preview=True)
             strip.setPixelColor(accdata(x, y), color)
     strip.show()
@@ -363,7 +371,7 @@ def main():
         draw_lose(strip, Color(0, 255, 0))
         GPIO.output(RELAYPIN, GPIO.LOW)
     except KeyboardInterrupt:
-        clear_table(strip, Color(0, 0, 0))
+        clear_table(strip, Color(0, 0, 0), all=True)
         GPIO.cleanup()
 
 
