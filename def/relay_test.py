@@ -11,7 +11,8 @@ GPIO.setup(DEFUSEPIN, GPIO.IN, pull_up_down = GPIO.PUD_DOWN)
 
 # pinList = [2, 3, 4, 17, 27, 22, 10, 9]
 # pinList = [29,31,33,35,37,32,36,38]
-pinList = [5,20,26,19,6,12,16,21] # 13 20
+pinList = [5,20,26,19,6,12,16,21] # 13 
+relay_out=[4,17,27,22,23,24,25,13]
 
 # loop through pins and set mode and state to 'low'
 
