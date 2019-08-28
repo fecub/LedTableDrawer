@@ -24,11 +24,32 @@ LED_DMA        = 10      # DMA channel to use for generating signal (try 10)
 LED_BRIGHTNESS = 60     # Set to 0 for darkest and 255 for brightest
 LED_INVERT     = False   # True to invert the signal (when using NPN transistor level shift)
 LED_CHANNEL    = 0       # set to '1' for GPIOs 13, 19, 41, 45 or 53
-RELAYPIN = 19
-GPIO.setmode(GPIO.BOARD)
-GPIO.setup(RELAYPIN, GPIO.OUT)
-GPIO.output(RELAYPIN, GPIO.LOW)
-# GPIO.output(RELAYPIN, GPIO.HIGH)
+
+GPIO.setmode(GPIO.BCM)
+
+
+#
+# PINS   
+##########
+eight_channel_relay_in = [5,20,26,19,6,12,16,21]
+eight_channel_relay_out=[4,17,27,22,23,24,25,13] # use button like
+FANPIN = 10 #19
+
+#
+# SETUPS
+##########
+for i in eight_channel_relay_in:
+    GPIO.setup(i, GPIO.OUT) 
+for i in eight_channel_relay_out:
+    GPIO.setup(i, GPIO.IN, pull_up_down = GPIO.PUD_DOWN)
+GPIO.setup(FANPIN, GPIO.OUT)
+
+
+#
+# INIT
+##########
+for i in eight_channel_relay_in:
+    GPIO.output(i, GPIO.LOW)
 
 def clear_screen(): return os.system('clear')
 
@@ -335,7 +356,7 @@ def clear_table(strip, color, all=False):
 def draw_animate(strips, colors):
     running = True
 
-    seconds = 60
+    seconds = 99
     while running:
         if (seconds == 0):
             running = False
@@ -343,11 +364,26 @@ def draw_animate(strips, colors):
         clear_table(strips, Color(0, 0, 0))
         # os.system("clear")
         draw_number(number=seconds, strip=strips, color=colors)
-        # PRETTY PRINT DATASET
-#        print(tabulate(preview_dataset, headers='keys',
-#                       tablefmt='fancy_grid', stralign='center'))
-        seconds = seconds - 1
+        
+        if(GPIO.input(eight_channel_relay_out[0])):
+            print("Kabel 0 wurde reingesteckt")
+        if(GPIO.input(eight_channel_relay_out[1])):
+            print("Kabel 1 wurde reingesteckt")
+        if(GPIO.input(eight_channel_relay_out[2])):
+            print("Kabel 2 wurde reingesteckt")
+        if(GPIO.input(eight_channel_relay_out[3])):
+            print("Kabel 3 wurde reingesteckt")
+        if(GPIO.input(eight_channel_relay_out[4])):
+            print("Kabel 4 wurde reingesteckt")
+        if(GPIO.input(eight_channel_relay_out[5])):
+            print("Kabel 5 wurde reingesteckt")
+        if(GPIO.input(eight_channel_relay_out[6])):
+            print("Kabel 6 wurde reingesteckt")
+        if(GPIO.input(eight_channel_relay_out[7])):
+            print("Kabel 7 wurde reingesteckt")
 
+        # time managing
+        seconds = seconds - 1
         time.sleep(1)
 
 def main():
@@ -360,29 +396,35 @@ def main():
 
     prepare_datasets()
 
-    # FULL DATASET
-    # print(dataset)
     try:
-
-        
-        GPIO.output(RELAYPIN, GPIO.HIGH)
+        GPIO.output(FANPIN, GPIO.HIGH)
         draw_frame(strip, Color(0, 255, 0))
         draw_animate(strip, Color(0, 255, 0))
         draw_lose(strip, Color(0, 255, 0))
-        GPIO.output(RELAYPIN, GPIO.LOW)
+        GPIO.output(FANPIN, GPIO.LOW)
     except KeyboardInterrupt:
         clear_table(strip, Color(0, 0, 0), all=True)
         GPIO.cleanup()
 
 
 
-    # draw_number(number1=9, number2=3)
-    # draw_number(number=9)
-
-    # PRETTY PRINT DATASET
-    # print(tabulate(preview_dataset, headers='keys',
-    #                tablefmt='fancy_grid', stralign='center'))
 
 
 if __name__ == "__main__":
     main()
+
+
+
+# PRETTY PRINT DATASET
+#        print(tabulate(preview_dataset, headers='keys',
+#                       tablefmt='fancy_grid', stralign='center'))
+
+# FULL DATASET
+# print(dataset)
+
+# draw_number(number1=9, number2=3)
+# draw_number(number=9)
+
+# PRETTY PRINT DATASET
+# print(tabulate(preview_dataset, headers='keys',
+#                tablefmt='fancy_grid', stralign='center'))
