@@ -16,32 +16,33 @@ import RPi.GPIO as GPIO
 dataset = None
 preview_dataset = None
 
-LED_COUNT      = 256      # Number of LED pixels.
-LED_PIN        = 18      # GPIO pin connected to the pixels (18 uses PWM!).
-#LED_PIN        = 10      # GPIO pin connected to the pixels (10 uses SPI /dev/spidev0.0).
-LED_FREQ_HZ    = 800000  # LED signal frequency in hertz (usually 800khz)
-LED_DMA        = 10      # DMA channel to use for generating signal (try 10)
+LED_COUNT = 256      # Number of LED pixels.
+LED_PIN = 18      # GPIO pin connected to the pixels (18 uses PWM!).
+# LED_PIN        = 10      # GPIO pin connected to the pixels (10 uses SPI /dev/spidev0.0).
+LED_FREQ_HZ = 800000  # LED signal frequency in hertz (usually 800khz)
+LED_DMA = 10      # DMA channel to use for generating signal (try 10)
 LED_BRIGHTNESS = 60     # Set to 0 for darkest and 255 for brightest
-LED_INVERT     = False   # True to invert the signal (when using NPN transistor level shift)
-LED_CHANNEL    = 0       # set to '1' for GPIOs 13, 19, 41, 45 or 53
+# True to invert the signal (when using NPN transistor level shift)
+LED_INVERT = False
+LED_CHANNEL = 0       # set to '1' for GPIOs 13, 19, 41, 45 or 53
 
 GPIO.setmode(GPIO.BCM)
 
 
 #
-# PINS   
+# PINS
 ##########
-eight_channel_relay_in = [5,20,26,19,6,12,16,21]
-eight_channel_relay_out=[4,17,27,22,23,24,25,13] # use button like
-FANPIN = 10 #19
+eight_channel_relay_in  = [5, 20, 26, 19,  6, 12, 16, 21]
+eight_channel_relay_out = [4, 17, 27, 22, 23, 24, 25, 13]  # use button like
+FANPIN = 10  # 19
 
 #
 # SETUPS
 ##########
 for i in eight_channel_relay_in:
-    GPIO.setup(i, GPIO.OUT) 
+    GPIO.setup(i, GPIO.OUT)
 for i in eight_channel_relay_out:
-    GPIO.setup(i, GPIO.IN, pull_up_down = GPIO.PUD_DOWN)
+    GPIO.setup(i, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 GPIO.setup(FANPIN, GPIO.OUT)
 
 
@@ -50,6 +51,7 @@ GPIO.setup(FANPIN, GPIO.OUT)
 ##########
 for i in eight_channel_relay_in:
     GPIO.output(i, GPIO.LOW)
+
 
 def clear_screen(): return os.system('clear')
 
@@ -128,7 +130,7 @@ def shift_object(x=0, y=0, shiftobject=None):
 
 def draw_frame(strip, color):
     # Rahmen
-    wait_ms=50
+    wait_ms = 50
     for i in range(16):
         # accdata(0, i, value='O', preview=True)
         # print("Setting pixel:", accdata(0, i))
@@ -271,7 +273,7 @@ def draw_number(number=None, strip=None, color=None):
     num = number
     num1 = None
     num2 = None
-    wait_ms=50
+    wait_ms = 50
 
     if (len(str(number)) > 1):
         num1, num2 = str(number)
@@ -303,10 +305,10 @@ def draw_number(number=None, strip=None, color=None):
             # accdata(pixel[0], pixel[1], 'O', preview=True)
             strip.setPixelColor(accdata(pixel[0], pixel[1]), color)
         strip.show()
-            # time.sleep(wait_ms/2000.0)
+        # time.sleep(wait_ms/2000.0)
 
 
-def draw_lose(strip,color):
+def draw_lose(strip, color):
     clear_table(strip, Color(0, 0, 0))
 
     for x in range(0, 15):
@@ -314,18 +316,7 @@ def draw_lose(strip,color):
             # accdata(x, y, " ", preview=True)
             strip.setPixelColor(accdata(x, y), color)
     strip.show()
-            # time.sleep(wait_ms/2000.0)
-
-    time.sleep(1)
-    clear_table(strip, Color(0, 0, 0))
-    time.sleep(1)
-
-    for x in range(0, 15):
-        for y in range(0, 15):
-            # accdata(x, y, " ", preview=True)
-            strip.setPixelColor(accdata(x, y), color)
-    strip.show()
-            # time.sleep(wait_ms/2000.0)
+    # time.sleep(wait_ms/2000.0)
 
     time.sleep(1)
     clear_table(strip, Color(0, 0, 0))
@@ -336,22 +327,34 @@ def draw_lose(strip,color):
             # accdata(x, y, " ", preview=True)
             strip.setPixelColor(accdata(x, y), color)
     strip.show()
+    # time.sleep(wait_ms/2000.0)
+
+    time.sleep(1)
+    clear_table(strip, Color(0, 0, 0))
+    time.sleep(1)
+
+    for x in range(0, 15):
+        for y in range(0, 15):
+            # accdata(x, y, " ", preview=True)
+            strip.setPixelColor(accdata(x, y), color)
+    strip.show()
+
 
 def clear_table(strip, color, all=False):
-    area_from=1
+    area_from = 1
     area_to = 15
 
     if all:
         area_from = 0
-        area_to=16
-   
+        area_to = 16
 
     for x in range(area_from, area_to):
         for y in range(area_from, area_to):
             # accdata(x, y, " ", preview=True)
             strip.setPixelColor(accdata(x, y), color)
     strip.show()
-            # time.sleep(wait_ms/2000.0)
+    # time.sleep(wait_ms/2000.0)
+
 
 def draw_animate(strips, colors):
     running = True
@@ -364,7 +367,7 @@ def draw_animate(strips, colors):
         clear_table(strips, Color(0, 0, 0))
         # os.system("clear")
         draw_number(number=seconds, strip=strips, color=colors)
-        
+
         if(GPIO.input(eight_channel_relay_out[0])):
             print("Kabel 0 wurde reingesteckt")
         if(GPIO.input(eight_channel_relay_out[1])):
@@ -386,11 +389,13 @@ def draw_animate(strips, colors):
         seconds = seconds - 1
         time.sleep(1)
 
+
 def main():
     global dataset, preview_dataset
-    
+
     # Create NeoPixel object with appropriate configuration.
-    strip = Adafruit_NeoPixel(LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS, LED_CHANNEL)
+    strip = Adafruit_NeoPixel(
+        LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS, LED_CHANNEL)
     # Intialize the library (must be called once before other functions).
     strip.begin()
 
@@ -407,12 +412,8 @@ def main():
         GPIO.cleanup()
 
 
-
-
-
 if __name__ == "__main__":
     main()
-
 
 
 # PRETTY PRINT DATASET
