@@ -33,8 +33,9 @@ GPIO.setmode(GPIO.BCM)
 # PINS
 ##########
 eight_channel_relay_in  = [5, 20, 26, 19,  6, 12, 16, 21]
-eight_channel_relay_out = [4, 17, 27, 22, 23, 24, 25, 13]  # use button like
+eight_channel_relay_out = [4, 17, 27, 22, 23, 24, 25,  8]  # 13 use button like
 FANPIN = 10  # 19
+
 
 #
 # SETUPS
@@ -368,22 +369,33 @@ def draw_animate(strips, colors):
         # os.system("clear")
         draw_number(number=seconds, strip=strips, color=colors)
 
+        for i in eight_channel_relay_out:
+            print(i)
+
         if(GPIO.input(eight_channel_relay_out[0])):
-            print("Kabel 0 wurde reingesteckt")
-        if(GPIO.input(eight_channel_relay_out[1])):
             print("Kabel 1 wurde reingesteckt")
-        if(GPIO.input(eight_channel_relay_out[2])):
+            print(eight_channel_relay_out[0])
+        if(GPIO.input(eight_channel_relay_out[1])):
             print("Kabel 2 wurde reingesteckt")
-        if(GPIO.input(eight_channel_relay_out[3])):
+            print(eight_channel_relay_out[1])
+        if(GPIO.input(eight_channel_relay_out[2])):
             print("Kabel 3 wurde reingesteckt")
-        if(GPIO.input(eight_channel_relay_out[4])):
+            print(eight_channel_relay_out[2])
+        if(GPIO.input(eight_channel_relay_out[3])):
             print("Kabel 4 wurde reingesteckt")
-        if(GPIO.input(eight_channel_relay_out[5])):
+            print(eight_channel_relay_out[3])
+        if(GPIO.input(eight_channel_relay_out[4])):
             print("Kabel 5 wurde reingesteckt")
-        if(GPIO.input(eight_channel_relay_out[6])):
+            print(eight_channel_relay_out[4])
+        if(GPIO.input(eight_channel_relay_out[5])):
             print("Kabel 6 wurde reingesteckt")
-        if(GPIO.input(eight_channel_relay_out[7])):
+            print(eight_channel_relay_out[5])
+        if(GPIO.input(eight_channel_relay_out[6])):
             print("Kabel 7 wurde reingesteckt")
+            print(eight_channel_relay_out[6])
+        if(GPIO.input(eight_channel_relay_out[7])):
+            print("Kabel 8 wurde reingesteckt")
+            print(eight_channel_relay_out[7])
 
         # time managing
         seconds = seconds - 1
