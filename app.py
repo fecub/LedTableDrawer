@@ -9,9 +9,11 @@ from colorama import Fore
 
 from threading import Timer
 import time
+from random import randrange
 
 from neopixel import *
 import RPi.GPIO as GPIO
+import serial
 
 dataset = None
 preview_dataset = None
@@ -21,10 +23,13 @@ LED_PIN = 18      # GPIO pin connected to the pixels (18 uses PWM!).
 # LED_PIN        = 10      # GPIO pin connected to the pixels (10 uses SPI /dev/spidev0.0).
 LED_FREQ_HZ = 800000  # LED signal frequency in hertz (usually 800khz)
 LED_DMA = 10      # DMA channel to use for generating signal (try 10)
-LED_BRIGHTNESS = 60     # Set to 0 for darkest and 255 for brightest
+LED_BRIGHTNESS = 40     # Set to 0 for darkest and 255 for brightest
 # True to invert the signal (when using NPN transistor level shift)
 LED_INVERT = False
 LED_CHANNEL = 0       # set to '1' for GPIOs 13, 19, 41, 45 or 53
+
+WIN_LIMIT = 2
+TRY_LIMIT = 4
 
 GPIO.setmode(GPIO.BCM)
 
@@ -32,9 +37,13 @@ GPIO.setmode(GPIO.BCM)
 #
 # PINS
 ##########
+# eight_channel_relay_in  = [5, 20, 26, 19,  6, 12, 16, 21]
+# eight_channel_relay_out = [4, 17, 27, 22, 23, 24, 25,  8]  # 13 use button like
+
 eight_channel_relay_in  = [5, 20, 26, 19,  6, 12, 16, 21]
 eight_channel_relay_out = [4, 17, 27, 22, 23, 24, 25,  8]  # 13 use button like
 FANPIN = 10  # 19
+CONTROLLERPIN = 7  # 19
 
 
 #
@@ -45,8 +54,9 @@ for i in eight_channel_relay_in:
 for i in eight_channel_relay_out:
     GPIO.setup(i, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 GPIO.setup(FANPIN, GPIO.OUT)
-
-
+GPIO.output(FANPIN, GPIO.LOW)
+GPIO.setup(CONTROLLERPIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN) # Set pin 10 to be an input pin and set initial value to be pulled low (off)
+GPIO.add_event_detect(CONTROLLERPIN, GPIO.RISING, bouncetime=1)
 #
 # INIT
 ##########
@@ -309,11 +319,11 @@ def draw_number(number=None, strip=None, color=None):
         # time.sleep(wait_ms/2000.0)
 
 
-def draw_lose(strip, color):
+def draw_lose_win(strip, color):
     clear_table(strip, Color(0, 0, 0))
 
-    for x in range(0, 15):
-        for y in range(0, 15):
+    for x in range(0, 16):
+        for y in range(0, 16):
             # accdata(x, y, " ", preview=True)
             strip.setPixelColor(accdata(x, y), color)
     strip.show()
@@ -323,8 +333,8 @@ def draw_lose(strip, color):
     clear_table(strip, Color(0, 0, 0))
     time.sleep(1)
 
-    for x in range(0, 15):
-        for y in range(0, 15):
+    for x in range(0, 16):
+        for y in range(0, 16):
             # accdata(x, y, " ", preview=True)
             strip.setPixelColor(accdata(x, y), color)
     strip.show()
@@ -334,8 +344,8 @@ def draw_lose(strip, color):
     clear_table(strip, Color(0, 0, 0))
     time.sleep(1)
 
-    for x in range(0, 15):
-        for y in range(0, 15):
+    for x in range(0, 16):
+        for y in range(0, 16):
             # accdata(x, y, " ", preview=True)
             strip.setPixelColor(accdata(x, y), color)
     strip.show()
@@ -357,75 +367,187 @@ def clear_table(strip, color, all=False):
     # time.sleep(wait_ms/2000.0)
 
 
-def draw_animate(strips, colors):
+def draw_animate(strip, colors, serial):
     running = True
 
-    seconds = 99
+    tmplist = list(eight_channel_relay_out)
+    win_list = []
+
+    # while True: 
+    #     print("eight_channel_relay_out: ", eight_channel_relay_out)
+    #     win_list = []
+    #     tmplist = list(eight_channel_relay_out)
+
+
+    #     while len(win_list) < 4:
+    #         rand_item = randrange(8)
+    #         print(rand_item, tmplist)
+    #         if (rand_item >= len(tmplist)):
+    #             continue
+    #         win_list.append(tmplist[rand_item])
+    #         tmplist.pop(rand_item)
+
+    #     print(win_list)
+
+    #     time.sleep(1)
+
+
+    while len(win_list) < 4:
+        rand_item = randrange(8)
+        if (rand_item >= len(tmplist)):
+            continue
+        win_list.append(tmplist[rand_item])
+        tmplist.pop(rand_item)
+
+    print(win_list)
+
+    seconds = 60
+    win_counter = 0
     while running:
+        plugged = []
+        if(seconds==60 or seconds==20 ): #or seconds==5
+            serial.write(str.encode("c"))
+
         if (seconds == 0):
+            serial.write(str.encode("q"))
             running = False
 
-        clear_table(strips, Color(0, 0, 0))
+        clear_table(strip, Color(0, 0, 0))
         # os.system("clear")
-        draw_number(number=seconds, strip=strips, color=colors)
+        draw_number(number=seconds, strip=strip, color=colors)
 
-        for i in eight_channel_relay_out:
-            print(i)
+        # for i in eight_channel_relay_out:
+        #     print(i)
 
         if(GPIO.input(eight_channel_relay_out[0])):
             print("Kabel 1 wurde reingesteckt")
-            print(eight_channel_relay_out[0])
+            if (eight_channel_relay_out[0] not in plugged):
+                plugged.append(eight_channel_relay_out[0])
         if(GPIO.input(eight_channel_relay_out[1])):
             print("Kabel 2 wurde reingesteckt")
-            print(eight_channel_relay_out[1])
+            if (eight_channel_relay_out[1] not in plugged):
+                plugged.append(eight_channel_relay_out[1])
         if(GPIO.input(eight_channel_relay_out[2])):
             print("Kabel 3 wurde reingesteckt")
-            print(eight_channel_relay_out[2])
+            if (eight_channel_relay_out[2] not in plugged):
+                plugged.append(eight_channel_relay_out[2])
         if(GPIO.input(eight_channel_relay_out[3])):
             print("Kabel 4 wurde reingesteckt")
-            print(eight_channel_relay_out[3])
+            if (eight_channel_relay_out[3] not in plugged):
+                plugged.append(eight_channel_relay_out[3])
         if(GPIO.input(eight_channel_relay_out[4])):
             print("Kabel 5 wurde reingesteckt")
-            print(eight_channel_relay_out[4])
+            if (eight_channel_relay_out[4] not in plugged):
+                plugged.append(eight_channel_relay_out[4])
         if(GPIO.input(eight_channel_relay_out[5])):
             print("Kabel 6 wurde reingesteckt")
-            print(eight_channel_relay_out[5])
+            if (eight_channel_relay_out[5] not in plugged):
+                plugged.append(eight_channel_relay_out[5])
         if(GPIO.input(eight_channel_relay_out[6])):
             print("Kabel 7 wurde reingesteckt")
-            print(eight_channel_relay_out[6])
+            if (eight_channel_relay_out[6] not in plugged):
+                plugged.append(eight_channel_relay_out[6])
         if(GPIO.input(eight_channel_relay_out[7])):
             print("Kabel 8 wurde reingesteckt")
-            print(eight_channel_relay_out[7])
+            if (eight_channel_relay_out[7] not in plugged):
+                plugged.append(eight_channel_relay_out[7])
 
+        print(plugged)
+
+        # if(len(plugged) > 4):
+        #     draw_lose_win(strip, Color(0, 255, 0))
+        #     print("VERLOREN1")
+        
+        win_counter = 0
+        for plug in plugged:
+            for win in win_list:
+                if (win_counter >= WIN_LIMIT):
+                    print("GEWONNEN")
+                    serial.write(str.encode("f"))
+                    draw_lose_win(strip, Color(255, 0, 0))
+                    GPIO.output(FANPIN, GPIO.LOW)
+                    return
+                elif(len(plugged)>=TRY_LIMIT and win_counter <= WIN_LIMIT):
+                    print("VERLOREN2")
+                    serial.write(str.encode("a"))
+                    draw_lose_win(strip, Color(0, 255, 0))
+                    return
+
+                print(plug, win, plug == win)
+                if ( plug == win ):
+                    win_counter = win_counter + 1
+
+
+            print(win_counter)
+                    
         # time managing
         seconds = seconds - 1
         time.sleep(1)
 
+    GPIO.output(FANPIN, GPIO.LOW)
+    serial.write(str.encode("a"))
+    draw_lose_win(strip, Color(0, 255, 0))
+    print("VERLOREN")
 
-def main():
-    global dataset, preview_dataset
+def button_callback(channel):
+    print("Button was pushed!")
 
+
+def main(serial, strip):
+    try:
+        GPIO.output(FANPIN, GPIO.HIGH)
+        draw_frame(strip, Color(0, 255, 0))
+        draw_animate(strip, Color(0, 255, 0), serial)
+        # draw_lose_win(strip, Color(0, 255, 0))
+        GPIO.output(FANPIN, GPIO.LOW)
+
+    except KeyboardInterrupt:
+        clear_table(strip, Color(0, 0, 0), all=True)
+        serial.write(str.encode("q"))
+        GPIO.cleanup()
+
+
+
+if __name__ == "__main__":
+    # global dataset, preview_dataset
+    print("PROGRAMM STARTED")
+    # GPIO.add_event_detect(CONTROLLERPIN,GPIO.RISING,callback=main) # Setup event on pin 10 rising edge
+    # GPIO.add_event_detect(CONTROLLERPIN,GPIO.FALLING,callback=main, bouncetime=5) # Setup event on pin 10 rising edge
+    # message = input("Press enter to quit\n\n")
+    # GPIO.cleanup()
+    # while True:
+    #     time.sleep(1)
+
+    print("[*] Open serial")
+    serial = serial.Serial('/dev/ttyUSB0', 9600, timeout=1)
+    time.sleep(5) 
+
+    print("[*] Preparing matrix for Led table")
+    prepare_datasets()
+
+    print("[*] Init Neopixel")
     # Create NeoPixel object with appropriate configuration.
     strip = Adafruit_NeoPixel(
         LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS, LED_CHANNEL)
     # Intialize the library (must be called once before other functions).
     strip.begin()
 
-    prepare_datasets()
-
-    try:
-        GPIO.output(FANPIN, GPIO.HIGH)
-        draw_frame(strip, Color(0, 255, 0))
-        draw_animate(strip, Color(0, 255, 0))
-        draw_lose(strip, Color(0, 255, 0))
-        GPIO.output(FANPIN, GPIO.LOW)
-    except KeyboardInterrupt:
-        clear_table(strip, Color(0, 0, 0), all=True)
-        GPIO.cleanup()
+    draw_frame(strip, Color(0, 0, 255))
 
 
-if __name__ == "__main__":
-    main()
+
+    print("[*] Starting main")
+    while True:
+        time.sleep(0.25)    
+        if GPIO.event_detected(CONTROLLERPIN):
+            GPIO.remove_event_detect(CONTROLLERPIN)
+            main(serial, strip)
+            time.sleep(1)
+            GPIO.add_event_detect(CONTROLLERPIN, GPIO.RISING, bouncetime=1)
+
+
+
+    # main()
 
 
 # PRETTY PRINT DATASET
