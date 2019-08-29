@@ -141,6 +141,7 @@ def shift_object(x=0, y=0, shiftobject=None):
 
 def draw_frame(strip, color):
     # Rahmen
+    clear_table(strip, Color(0, 0, 0), all=True)
     wait_ms = 50
     for i in range(16):
         # accdata(0, i, value='O', preview=True)
@@ -417,13 +418,13 @@ def draw_animate(strip, colors, serial):
         for plug in plugged:
             for win in win_list:
                 if (win_counter >= WIN_LIMIT):
-                    logging.info("GEWONNEN")
+                    logging.info("[*] GEWONNEN")
                     serial.write(str.encode("f"))
                     draw_lose_win(strip, Color(255, 0, 0))
                     GPIO.output(FANPIN, GPIO.LOW)
                     return
                 elif(len(plugged)>=TRY_LIMIT and win_counter <= WIN_LIMIT):
-                    logging.info("VERLOREN2")
+                    logging.info("[*] VERLOREN **")
                     serial.write(str.encode("a"))
                     draw_lose_win(strip, Color(0, 255, 0))
                     return
@@ -439,7 +440,7 @@ def draw_animate(strip, colors, serial):
     GPIO.output(FANPIN, GPIO.LOW)
     serial.write(str.encode("a"))
     draw_lose_win(strip, Color(0, 255, 0))
-    logging.info("VERLOREN")
+    logging.info("[*] VERLOREN *")
 
 def main(serial, strip):
     try:
@@ -458,7 +459,7 @@ def main(serial, strip):
 if __name__ == "__main__":
     # global dataset, preview_dataset
     print("[*] Init logger")
-    logging.basicConfig(filename='app.log', filemode='a', format='[ %(asctime)s ] %(name)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S')
+    logging.basicConfig(level=logging.INFO,filename='/home/pi/app.log', filemode='a', format='[ %(asctime)s ] %(name)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S')
     
     logging.info("[*] PROGRAMM STARTED")
     

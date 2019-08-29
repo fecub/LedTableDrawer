@@ -3,7 +3,7 @@ import logging
 #logger = logging.getLogger('example_logger')
 
 # format='%(asctime)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S'
-logging.basicConfig(filename='app.log', filemode='a', format='[ %(asctime)s ] %(name)s - %(levelname)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S')
+logging.basicConfig(level=logging.INFO, filename='app.log', filemode='a', format='[ %(asctime)s ] %(name)s - %(levelname)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S')
 logging.info('This is an info message')
 logging.warning('This will get logged to a file')
 
