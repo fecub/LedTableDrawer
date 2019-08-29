@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import os
+import logging 
 
 from tabulate import tabulate
 
@@ -129,7 +130,6 @@ def accdata(row, col, value='', preview=False):
 
 def shift_object(x=0, y=0, shiftobject=None):
     for obj in shiftobject:
-        # print(obj)
         if(x != 0):
             obj[0] = obj[0] + x
 
@@ -144,25 +144,21 @@ def draw_frame(strip, color):
     wait_ms = 50
     for i in range(16):
         # accdata(0, i, value='O', preview=True)
-        # print("Setting pixel:", accdata(0, i))
         strip.setPixelColor(accdata(0, i), color)
         strip.show()
         time.sleep(wait_ms/1000.0)
     for i in range(16):
         # accdata(i, 0, value='O', preview=True)
-        # print("Setting pixel:", accdata(i, 0))
         strip.setPixelColor(accdata(i, 0), color)
         strip.show()
         time.sleep(wait_ms/1000.0)
     for i in range(16):
         # accdata(15, i, value='O', preview=True)
-        # print("Setting pixel:", accdata(15, i))
         strip.setPixelColor(accdata(15, i), color)
         strip.show()
         time.sleep(wait_ms/1000.0)
     for i in range(16):
         # accdata(i, 15, value='O', preview=True)
-        # print("Setting pixel:", accdata(i, 15))
         strip.setPixelColor(accdata(i, 15), color)
         strip.show()
         time.sleep(wait_ms/1000.0)
@@ -288,7 +284,6 @@ def draw_number(number=None, strip=None, color=None):
 
     if (len(str(number)) > 1):
         num1, num2 = str(number)
-        print(num1, type(num1), num2, type(num2))
         num1 = int(num1)
         num2 = int(num2)
 
@@ -364,7 +359,6 @@ def clear_table(strip, color, all=False):
             # accdata(x, y, " ", preview=True)
             strip.setPixelColor(accdata(x, y), color)
     strip.show()
-    # time.sleep(wait_ms/2000.0)
 
 
 def draw_animate(strip, colors, serial):
@@ -373,25 +367,6 @@ def draw_animate(strip, colors, serial):
     tmplist = list(eight_channel_relay_out)
     win_list = []
 
-    # while True: 
-    #     print("eight_channel_relay_out: ", eight_channel_relay_out)
-    #     win_list = []
-    #     tmplist = list(eight_channel_relay_out)
-
-
-    #     while len(win_list) < 4:
-    #         rand_item = randrange(8)
-    #         print(rand_item, tmplist)
-    #         if (rand_item >= len(tmplist)):
-    #             continue
-    #         win_list.append(tmplist[rand_item])
-    #         tmplist.pop(rand_item)
-
-    #     print(win_list)
-
-    #     time.sleep(1)
-
-
     while len(win_list) < 4:
         rand_item = randrange(8)
         if (rand_item >= len(tmplist)):
@@ -399,13 +374,11 @@ def draw_animate(strip, colors, serial):
         win_list.append(tmplist[rand_item])
         tmplist.pop(rand_item)
 
-    print(win_list)
-
     seconds = 60
     win_counter = 0
     while running:
         plugged = []
-        if(seconds==60 or seconds==20 ): #or seconds==5
+        if(seconds==60 or seconds==20 ):
             serial.write(str.encode("c"))
 
         if (seconds == 0):
@@ -413,73 +386,52 @@ def draw_animate(strip, colors, serial):
             running = False
 
         clear_table(strip, Color(0, 0, 0))
-        # os.system("clear")
         draw_number(number=seconds, strip=strip, color=colors)
 
-        # for i in eight_channel_relay_out:
-        #     print(i)
-
         if(GPIO.input(eight_channel_relay_out[0])):
-            print("Kabel 1 wurde reingesteckt")
             if (eight_channel_relay_out[0] not in plugged):
                 plugged.append(eight_channel_relay_out[0])
         if(GPIO.input(eight_channel_relay_out[1])):
-            print("Kabel 2 wurde reingesteckt")
             if (eight_channel_relay_out[1] not in plugged):
                 plugged.append(eight_channel_relay_out[1])
         if(GPIO.input(eight_channel_relay_out[2])):
-            print("Kabel 3 wurde reingesteckt")
             if (eight_channel_relay_out[2] not in plugged):
                 plugged.append(eight_channel_relay_out[2])
         if(GPIO.input(eight_channel_relay_out[3])):
-            print("Kabel 4 wurde reingesteckt")
             if (eight_channel_relay_out[3] not in plugged):
                 plugged.append(eight_channel_relay_out[3])
         if(GPIO.input(eight_channel_relay_out[4])):
-            print("Kabel 5 wurde reingesteckt")
             if (eight_channel_relay_out[4] not in plugged):
                 plugged.append(eight_channel_relay_out[4])
         if(GPIO.input(eight_channel_relay_out[5])):
-            print("Kabel 6 wurde reingesteckt")
             if (eight_channel_relay_out[5] not in plugged):
                 plugged.append(eight_channel_relay_out[5])
         if(GPIO.input(eight_channel_relay_out[6])):
-            print("Kabel 7 wurde reingesteckt")
             if (eight_channel_relay_out[6] not in plugged):
                 plugged.append(eight_channel_relay_out[6])
         if(GPIO.input(eight_channel_relay_out[7])):
-            print("Kabel 8 wurde reingesteckt")
             if (eight_channel_relay_out[7] not in plugged):
                 plugged.append(eight_channel_relay_out[7])
 
-        print(plugged)
-
-        # if(len(plugged) > 4):
-        #     draw_lose_win(strip, Color(0, 255, 0))
-        #     print("VERLOREN1")
-        
         win_counter = 0
         for plug in plugged:
             for win in win_list:
                 if (win_counter >= WIN_LIMIT):
-                    print("GEWONNEN")
+                    logging.info("GEWONNEN")
                     serial.write(str.encode("f"))
                     draw_lose_win(strip, Color(255, 0, 0))
                     GPIO.output(FANPIN, GPIO.LOW)
                     return
                 elif(len(plugged)>=TRY_LIMIT and win_counter <= WIN_LIMIT):
-                    print("VERLOREN2")
+                    logging.info("VERLOREN2")
                     serial.write(str.encode("a"))
                     draw_lose_win(strip, Color(0, 255, 0))
                     return
 
-                print(plug, win, plug == win)
                 if ( plug == win ):
                     win_counter = win_counter + 1
 
 
-            print(win_counter)
-                    
         # time managing
         seconds = seconds - 1
         time.sleep(1)
@@ -487,18 +439,13 @@ def draw_animate(strip, colors, serial):
     GPIO.output(FANPIN, GPIO.LOW)
     serial.write(str.encode("a"))
     draw_lose_win(strip, Color(0, 255, 0))
-    print("VERLOREN")
-
-def button_callback(channel):
-    print("Button was pushed!")
-
+    logging.info("VERLOREN")
 
 def main(serial, strip):
     try:
         GPIO.output(FANPIN, GPIO.HIGH)
         draw_frame(strip, Color(0, 255, 0))
         draw_animate(strip, Color(0, 255, 0), serial)
-        # draw_lose_win(strip, Color(0, 255, 0))
         GPIO.output(FANPIN, GPIO.LOW)
 
     except KeyboardInterrupt:
@@ -510,22 +457,19 @@ def main(serial, strip):
 
 if __name__ == "__main__":
     # global dataset, preview_dataset
-    print("PROGRAMM STARTED")
-    # GPIO.add_event_detect(CONTROLLERPIN,GPIO.RISING,callback=main) # Setup event on pin 10 rising edge
-    # GPIO.add_event_detect(CONTROLLERPIN,GPIO.FALLING,callback=main, bouncetime=5) # Setup event on pin 10 rising edge
-    # message = input("Press enter to quit\n\n")
-    # GPIO.cleanup()
-    # while True:
-    #     time.sleep(1)
-
-    print("[*] Open serial")
+    print("[*] Init logger")
+    logging.basicConfig(filename='app.log', filemode='a', format='[ %(asctime)s ] %(name)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S')
+    
+    logging.info("[*] PROGRAMM STARTED")
+    
+    logging.info('[*] Open serial')
     serial = serial.Serial('/dev/ttyUSB0', 9600, timeout=1)
     time.sleep(5) 
 
-    print("[*] Preparing matrix for Led table")
+    logging.info("[*] Preparing matrix for Led table")
     prepare_datasets()
 
-    print("[*] Init Neopixel")
+    logging.info("[*] Init Neopixel")
     # Create NeoPixel object with appropriate configuration.
     strip = Adafruit_NeoPixel(
         LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS, LED_CHANNEL)
@@ -534,9 +478,7 @@ if __name__ == "__main__":
 
     draw_frame(strip, Color(0, 0, 255))
 
-
-
-    print("[*] Starting main")
+    logging.info("[*] Starting main")
     while True:
         time.sleep(0.25)    
         if GPIO.event_detected(CONTROLLERPIN):
