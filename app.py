@@ -424,13 +424,8 @@ def draw_animate(strip, colors, serial):
                     draw_lose_win(strip, Color(255, 0, 0))
                     GPIO.output(FANPIN, GPIO.LOW)
                     return
-<<<<<<< HEAD
                 elif(len(plugged)>=TRY_LIMIT and win_counter <= WIN_LIMIT):
                     logging.info("[*] VERLOREN **")
-=======
-                elif(len(plugged) >= TRY_LIMIT and win_counter <= WIN_LIMIT):
-                    logging.info("VERLOREN2")
->>>>>>> e60df6e661a1d07c2bf41c89dc85fdb68b4ec265
                     serial.write(str.encode("a"))
                     draw_lose_win(strip, Color(0, 255, 0))
                     return
