@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 import os
-import logging 
+import logging
 
 from tabulate import tabulate
 
@@ -41,7 +41,7 @@ GPIO.setmode(GPIO.BCM)
 # eight_channel_relay_in  = [5, 20, 26, 19,  6, 12, 16, 21]
 # eight_channel_relay_out = [4, 17, 27, 22, 23, 24, 25,  8]  # 13 use button like
 
-eight_channel_relay_in  = [5, 20, 26, 19,  6, 12, 16, 21]
+eight_channel_relay_in = [5, 20, 26, 19,  6, 12, 16, 21]
 eight_channel_relay_out = [4, 17, 27, 22, 23, 24, 25,  8]  # 13 use button like
 FANPIN = 10  # 19
 CONTROLLERPIN = 7  # 19
@@ -56,7 +56,8 @@ for i in eight_channel_relay_out:
     GPIO.setup(i, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 GPIO.setup(FANPIN, GPIO.OUT)
 GPIO.output(FANPIN, GPIO.LOW)
-GPIO.setup(CONTROLLERPIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN) # Set pin 10 to be an input pin and set initial value to be pulled low (off)
+# Set pin 10 to be an input pin and set initial value to be pulled low (off)
+GPIO.setup(CONTROLLERPIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 GPIO.add_event_detect(CONTROLLERPIN, GPIO.RISING, bouncetime=1)
 #
 # INIT
@@ -379,7 +380,7 @@ def draw_animate(strip, colors, serial):
     win_counter = 0
     while running:
         plugged = []
-        if(seconds==60 or seconds==20 ):
+        if(seconds == 60 or seconds == 20):
             serial.write(str.encode("c"))
 
         if (seconds == 0):
@@ -423,15 +424,19 @@ def draw_animate(strip, colors, serial):
                     draw_lose_win(strip, Color(255, 0, 0))
                     GPIO.output(FANPIN, GPIO.LOW)
                     return
+<<<<<<< HEAD
                 elif(len(plugged)>=TRY_LIMIT and win_counter <= WIN_LIMIT):
                     logging.info("[*] VERLOREN **")
+=======
+                elif(len(plugged) >= TRY_LIMIT and win_counter <= WIN_LIMIT):
+                    logging.info("VERLOREN2")
+>>>>>>> e60df6e661a1d07c2bf41c89dc85fdb68b4ec265
                     serial.write(str.encode("a"))
                     draw_lose_win(strip, Color(0, 255, 0))
                     return
 
-                if ( plug == win ):
+                if (plug == win):
                     win_counter = win_counter + 1
-
 
         # time managing
         seconds = seconds - 1
@@ -441,6 +446,7 @@ def draw_animate(strip, colors, serial):
     serial.write(str.encode("a"))
     draw_lose_win(strip, Color(0, 255, 0))
     logging.info("[*] VERLOREN *")
+
 
 def main(serial, strip):
     try:
@@ -455,17 +461,16 @@ def main(serial, strip):
         GPIO.cleanup()
 
 
-
 if __name__ == "__main__":
     # global dataset, preview_dataset
     print("[*] Init logger")
     logging.basicConfig(level=logging.INFO,filename='/home/pi/app.log', filemode='a', format='[ %(asctime)s ] %(name)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S')
     
     logging.info("[*] PROGRAMM STARTED")
-    
+
     logging.info('[*] Open serial')
     serial = serial.Serial('/dev/ttyUSB0', 9600, timeout=1)
-    time.sleep(5) 
+    time.sleep(5)
 
     logging.info("[*] Preparing matrix for Led table")
     prepare_datasets()
@@ -481,14 +486,12 @@ if __name__ == "__main__":
 
     logging.info("[*] Starting main")
     while True:
-        time.sleep(0.25)    
+        time.sleep(0.25)
         if GPIO.event_detected(CONTROLLERPIN):
             GPIO.remove_event_detect(CONTROLLERPIN)
             main(serial, strip)
             time.sleep(1)
             GPIO.add_event_detect(CONTROLLERPIN, GPIO.RISING, bouncetime=1)
-
-
 
     # main()
 
